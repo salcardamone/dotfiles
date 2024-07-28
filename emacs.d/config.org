@@ -32,10 +32,15 @@
 
 ** Theme
 #+begin_src emacs-lisp
-  (use-package zerodark-theme
+  (use-package doom-themes
     :ensure t
     :init
-    (load-theme 'zerodark t))
+    (load-theme 'doom-dark+ t))
+
+  (with-eval-after-load 'doom-themes
+    (doom-themes-treemacs-config))
+  (setq doom-themes-treemacs-theme "doom-colors")
+     (add-hook 'treemacs-mode-hook (lambda () (text-scale-decrease 1.5)))
 #+end_src
 
 ** Sounds
@@ -292,16 +297,6 @@ Following will only apply when company kicks in -- doesn't override regular keyb
     (add-to-list 'company-backends 'company-irony))
 #+end_src
 
-* Irony Mode
-#+begin_src emacs-lisp
-  (use-package irony
-    :ensure t
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-#+end_src
-
 * eglot
 #+begin_src emacs-lisp
   (with-eval-after-load 'eglot
@@ -322,19 +317,18 @@ Following will only apply when company kicks in -- doesn't override regular keyb
                    . ("cmake-language-server"))))
 #+end_src
 
+* treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t)
+#+end_src
+
 * C/C++ Configuration
 ** Clang-Format
 #+begin_src emacs-lisp
   (use-package clang-format
     :ensure t
     :bind (("C-c f" . clang-format-buffer)))
-#+end_src
-
-** Doxygen Formatting
-#+begin_src emacs-lisp
-  (use-package highlight-doxygen
-    :ensure t
-    :config (highlight-doxygen-global-mode))
 #+end_src
 
 ** Meson Mode
@@ -384,26 +378,8 @@ Following will only apply when company kicks in -- doesn't override regular keyb
   (add-hook 'vhdl-mode-hook 'yas-minor-mode)
 #+end_src
 
-* Templates
-#+begin_src emacs-lisp
-  (defun maybe-load-template ()
-    (interactive)
-    (cond
-     ((and (string-match "\\.cpp$" (buffer-file-name))
-	   (eq 1 (point-max)))
-      (insert-file-contents "~/.emacs.d/templates/template.cpp"))
-     ((and (string-match "\\.hpp$" (buffer-file-name))
-	   (eq 1 (point-max)))
-      (insert-file-contents "~/.emacs.d/templates/template.hpp"))
-     (t
-      (message "Didn't recognise template for %s" (buffer-file-name)))))
-
-  (add-hook 'find-file-hooks 'maybe-load-template)
-#+end_src
-
 * org
 Note that the following configuration is taken from https://github.com/james-stoup/emacs-org-mode-tutorial?tab=readme-ov-file
-
 ** Setup
 #+begin_src emacs-lisp
   ;; Setup use-package just in case everything isn't already installed
