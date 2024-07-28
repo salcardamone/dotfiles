@@ -3,4 +3,4 @@ emacs.d/ido*
 emacs.d/*save*
 emacs.d/elpa*
 emacs.d/recentf
-emacs.d/.emacs
+emacs.d/config.el
