@@ -362,6 +362,16 @@ Following will only apply when company kicks in -- doesn't override regular keyb
   ;; (add-hook 'vhdl-special-indent-hook 'my-vhdl-indent-generic-instantiation)
 #+end_src
 
+* Docker
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode
+    :ensure t)
+
+  (use-package docker
+    :ensure t
+    :bind ("C-c d" . docker))
+#+end_src
+
 * Yasnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -469,4 +479,23 @@ Note that the following configuration is taken from https://github.com/james-sto
                :empty-lines 0)
 
           ))
+#+end_src
+
+** babel
+;; python example:
+;;
+;; #+begin_src python
+;;    return 5;
+;; #+end_src
+;;
+;; C++ example:
+;;
+;; #+begin_src C++ :includes '(<iostream> <stdio.h>) :results output
+;;    std::cout<<"Hello World!\n";
+;;    printf("%d\n", 2+2);
+;; #+end_src
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t) (C . t)))
 #+end_src
