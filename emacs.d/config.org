@@ -1,13 +1,26 @@
 * Look And Feel
 ** Startup
 #+begin_src emacs-lisp
-  (setq inhibit-splash-screen t)
-  (setq inhibit-startup-message t)
+    (setq inhibit-splash-screen t)
+    (setq inhibit-startup-message t)
 
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (toggle-frame-fullscreen)
-#+end_src
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (toggle-frame-fullscreen)
+
+    (defun my-setup-initial-windows ()
+      "Setup initial window configuration with welcome message and eshell."
+      (delete-other-windows)             ; Ensure we start with a single window
+      (split-window-vertically)          ; Split the window vertically
+      (other-window 1)                   ; Move to the newly created window
+      (eshell)                           ; Start term in the new window
+      ;; Shrink the eshell window vertically a number of times
+      (shrink-window 10)
+      (other-window 1))                  ; Return to the original window
+
+    ;; Add the setup function to the 'emacs-startup-hook'
+    (add-hook 'emacs-startup-hook 'my-setup-initial-windows)
+  #+end_src
 
 ** Line/Column Numbers
 #+begin_src emacs-lisp
@@ -173,6 +186,18 @@
   (global-set-key (kbd "C-%") 'my-query-replace-selected-region)
 #+end_src
 
+** Multiple Cursors
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :bind (
+           ("C-S-c C-S-c" . 'mc/edit-lines)
+           ("C->" . 'mc/mark-next-like-this)
+           ("C-<" . 'mc/mark-previous-like-this)
+           ("C-c C-<" . 'mc/mark-all-like-this)
+           ))
+#+end_src
+
 * Terminal
 ** Setting Default Shell
 #+begin_src emacs-lisp
@@ -299,22 +324,37 @@ Following will only apply when company kicks in -- doesn't override regular keyb
 
 * eglot
 #+begin_src emacs-lisp
+  (use-package eldoc-box
+    :ensure t)
+
+  (use-package eglot
+    :ensure t
+    :bind (("C-c f" . eglot-format-buffer)
+           ("C-c ?" . eldoc))
+    :hook
+    ((c++-mode . eglot-ensure))
+    ((c-mode . eglot-ensure))
+    ((cmake-mode . eglot-ensure)))
+
   (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
-                 '((c-mode c++-mode)
-                   . ("clangd"
-                      "-j=8"
-                      "--log=error"
-                      "--malloc-trim"
-                      "--background-index"
-                      "--clang-tidy"
-                      "--cross-file-rename"
-                      "--completion-style=detailed"
-                      "--pch-storage=memory"
-                      "--header-insertion=never"
-                      "--header-insertion-decorators=0"))
-                 '((cmake-mode)
-                   . ("cmake-language-server"))))
+      (add-to-list 'eglot-server-programs
+                   '((c-mode c++-mode)
+                     . ("clangd"
+                        "-j=8"
+                        "--log=error"
+                        "--malloc-trim"
+                        "--background-index"
+                        "--clang-tidy"
+                        "--cross-file-rename"
+                        "--completion-style=detailed"
+                        "--pch-storage=memory"
+                        "--header-insertion=never"
+                        "--header-insertion-decorators=0"))
+                   '((cmake-mode)
+                     . ("cmake-language-server"))))
+
+  (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode t)
+  (add-hook 'eglot-managed-mode-hook #'eldoc-box-help-at-point t)
 #+end_src
 
 * treemacs
@@ -324,12 +364,6 @@ Following will only apply when company kicks in -- doesn't override regular keyb
 #+end_src
 
 * C/C++ Configuration
-** Clang-Format
-#+begin_src emacs-lisp
-  (use-package clang-format
-    :ensure t
-    :bind (("C-c f" . clang-format-buffer)))
-#+end_src
 
 ** Meson Mode
 #+begin_src emacs-lisp
@@ -499,3 +533,18 @@ Note that the following configuration is taken from https://github.com/james-sto
    'org-babel-load-languages
    '((python . t) (C . t)))
 #+end_src
+
+* Markdown Mode
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t)
+#+end_src
+
+* Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t)
+#+end_src
+
+
+
